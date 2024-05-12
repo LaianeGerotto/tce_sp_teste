@@ -11,6 +11,11 @@ requests = "^2.31.0"
 black = "^24.4.2"
 flake8 = "^7.0.0"
 beautifulsoup4 = "^4.12.3"
+python-dotenv = "^1.0.1"
+sqlalchemy = "^2.0.30"
+sqlalchemy-utils = "^0.41.2"
+datetime = "^5.5"
+pymysql = "^1.1.0"
 
 
 [build-system]
