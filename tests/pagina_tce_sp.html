@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pesquisa de Jurisprud&ecirc;ncia</title>
+    <meta name="layout" content="main" />
+
+    <script src="/jurisprudencia/res/js/jquery-3.1.0.min.js"/></script>
+    <script src="/jurisprudencia/res/js/jquery-ui.min.js"/></script>
+    <script src="/jurisprudencia/res/js/jquery-datePicker-pt-BR.js"/></script>
+    <script src="/jurisprudencia/res/js/jquery.mask.min.js"/></script>
+    <link href="/jurisprudencia/res/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/css/main.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/css/jquery-ui.min.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/img/favicon.ico" rel="icon">
+    <script src="/jurisprudencia/res/iframe-resizer-master/js/iframeResizer.contentWindow.min.js"/></script>
+
+    <!-- Componentes JS externos -->
+    <link href="/jurisprudencia/res/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/select2-4.0.5/css/select2.min.css" rel="stylesheet">
+    <script src="/jurisprudencia/res/select2-4.0.5/js/select2.min.js"></script>
+
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+
+	<style>
+
+
+        a:visited {
+            color: rgb(170,43,43);
+        }
+
+        .alinhamento{
+            vertical-align: middle !important;
+        }
+
+        tbody:before {
+            content: "-";
+            display: block;
+            line-height: 1em;
+            color: transparent;
+        }
+
+        .nopadding {
+            //padding: 0px !important;
+            padding-left: 0px !important;
+            padding-right: 0px !important;
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+            margin: 0px !important;
+            margin-top: 0px !important;
+            margin-left: 0px !important;
+            margin-bottom: 0px !important;
+        }
+
+        .borda-superior{
+            background: #f5f5f5;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .borda-cabecalho  th{
+            border-top: 1px solid #777 !important;
+            border-bottom: 1px solid #777 !important;
+        }
+
+        .link-cabecalho {
+            color:#333 !important;
+            font-size: 85%;
+            font-weight: bold;
+        }
+
+        .texto-resultado-busca{
+            background: #ffffdb;
+            padding: 2px 4px;
+            border: 1px solid #ccccaa;
+        }
+
+        .label-texto {
+            display: inline-block;
+            max-width: 100%;
+            /* margin-bottom: 5px; */
+            font-weight: 700;
+        }
+
+        .table-docs {
+            border-collapse: collapse;
+        }
+
+        .titulo-tabela {
+            background-color: #ddd;
+        }
+
+        .titulo-tabela {
+            background-color: #ddd;
+        }
+
+        .titulo-trechos {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+
+        .small .sem-borda {
+            padding: 10px 10px 10px 50px;
+        }
+
+        .trechos-documento {
+            margin: 10px 0px 30px 0px !important;
+            list-style: none;
+            padding-left: 0px;
+        }
+
+        ul.trechos-documento li {
+            text-align: justify;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+            background: #fafafa;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .largura{
+            width: 100%;
+            padding
+        }
+
+        .largura-label{
+            width: 0%;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .date {
+            width: 250px;
+        }
+
+        .comboNumber {
+            width: 100px;
+        }
+
+        .date_50p {
+            width: 100%;
+        }
+
+        .margemCheckbox {
+            margin: 10px 5px 2px 40px !important;
+        }
+
+        .checkbox-ajuste-horizontal {
+            margin-left: -40px;
+        }
+
+	</style>
+	
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body class="nopadding largura">
+
+<!-- INICIO Parte do Cabeçalho TCESP-->
+
+
+
+        
+
+        <div class="navbar-form container" style="margin-left: 0px">
+
+        <script>
+
+            function submitFiltroPesqRapida(formulario){
+                document.getElementById("acao").value = "Executa";
+                document.getElementById("buscaRapida").value = "true";
+                document.getElementById("ignorarEntrada").value = "false";
+                return true;
+            }
+
+            function submitFiltroAvancada(){
+                document.getElementById("acao").value = "Pesquisar";
+                document.getElementById("buscaRapida").value = "false";
+                document.getElementById("ignorarEntrada").value = "true";
+                return true;
+            }
+
+        </script>
+
+        <form id="filtro" name="filtro" action="pesquisar" method="get">
+
+                <!-- Grupo Todas Palavras -->
+                <div class="pull-left row">
+
+                    <label class="control-label" style="" >Buscar por palavras:</label>
+                    <input type="text" name="txtTdPalvs" value='Fraudes'  class="form-control" maxlength="1024" placeHolder="Exemplo: Merenda Escolar fraude" style="margin-right: 25px" />
+
+                    <label class="control-label " style="">N&deg; Processo:</label>
+                    <input type="text" name="processo" id="processo" value=""  class="form-control" maxlength="15" placeHolder="Exemplo: 1023/026/17 " style="margin-right: 25px"/>
+
+                    <input type="hidden" id="acao" name="acao" value="Executa">
+                    <input type="hidden" id="buscaRapida" name="buscaRapida" value="true">
+                    <input type="hidden" id="ignorarEntrada" name="ignorarEntrada" value="false">
+
+                    <input type="submit" value="Pesquisa R&aacute;pida"  class="btn btn-info" onclick="submitFiltroPesqRapida(this)"/>
+                    <input type="submit" value="<< Pesquisa Avan&ccedil;ada"  class="btn btn-info"onclick="submitFiltroAvancada(this)"/>
+
+            <script>
+                $( function() {
+                    $('#processo').mask('######/###/##', {reverse: true});
+                } );
+            </script>
+
+                </div>
+        </form>
+</div>
+
+<div style="clear: both"></div>
+
+
+        
+            <div class="page-header largura">
+                <h3 class="nopadding">Foram encontrados 55 registros</h3>
+            </div>
+        
+
+        </br>
+
+        
+
+        
+        <div class="text-center alert alert-warning largura" role="alert">
+    <h5>O resultado aqui apresentado possui car&aacute;ter meramente informativo, n&atilde;o se prestando para contagem de quaisquer prazos processuais.</h5>
+</div>
+
+        
+
+        <!--
+        <form action="pesquisar" class="form-group">
+            <div class="col-md-5">
+                <input type="submit" value="<< Pesquisa Avançada" class="btn btn-info"/>
+                <input type="hidden" name="acao" value="Pesquisar">
+            </div>
+        </form> -->
+
+
+        
+
+            <table class="table largura table-docs">
+
+                <thead class="titulo-tabela borda-cabecalho">
+                    <tr >
+                        <th width="8%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                https://pt.lipsum.com/ >
+                                Teste1.<span class="fa fa-sort"></span> </a>
+                            
+                            
+                        </th>
+
+                        <th width="9%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                https://pt.lipsum.com/ >
+                                N&deg; Teste2.<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+
+                        <th width="10%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                https://pt.lipsum.com/ >
+                                Teste3<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+                        <th width="15%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                https://pt.lipsum.com/ >
+                                Teste4<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+                        <th width="15%"class=" alinhamento">
+
+                            
+                                <a class="link-cabecalho" href=
+                                https://pt.lipsum.com/ >
+                                Teste5<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+
+                        <th width="15%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                https://pt.lipsum.com/ >
+                                Teste6<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+
+                        <th width="19%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                https://pt.lipsum.com/ >
+                            Teste7<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+
+                        <th class="alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                https://pt.lipsum.com/ >
+                                Teste8<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://pt.lipsum.com//pdf/00001.pdf' target="_blank">
+                                    Aaa
+                                </a>
+                            </td>
+                            <td class="small "><a href="https://pt.lipsum.com/" >000/000/01</a>
+                            <td class="small ">01/01/2023 </td>
+                            <td class="small "> </td>
+                            <td class="small ">Cras et posuere metus</td>
+                            <td class="small ">Lorem Ipsum 1</td>
+                            <td class="small ">Pellentesque dui massa</td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ... 
+
+INTERESSADO(A): AAAAA  AAAAAA AAAAAAA (CPF ***.123.268-**) 
+ADVOGADO: GSSGSG GSGSG (OAB/XX 01.001) 
+
+ASSUNTO:  Quisque condimentum - Exercício de 2023 
+EXERCÍCIO:  2023 
+INSTRUÇÃO POR: UR-20 
+PROCESSO(S) DEPENDENTES(S): 0000000010000
+ 
+
+ 
+
+ASSUNTO:  Vestibulum ante ipsum primis in faucibus orci luctus et ultrices.
+
+Fusce quis ullamcorper nulla. Morbi feugiat mi a metus tincidunt maximus. Aenean dictum tortor nisi,
+
+ 
+
+ornare ante ut purus commodo interdum. <span class="texto-resultado-busca">Lorem</span> em 
+
+ornare ante ut purus commodo interdum.
+
+Sed cursus lorem eget libero gravida, a ultrices nunc pulvinar...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://pt.lipsum.com//pdf/00002.pdf' target="_blank">
+                                    Bbb
+                                </a>
+                            </td>
+                            <td class="small "><a href="https://pt.lipsum.com/" >000/000/02</a>
+                            <td class="small ">02/02/2023 </td>
+                            <td class="small "> </td>
+                            <td class="small ">Aenean dictum tortor</td>
+                            <td class="small ">Lorem Ipsum 2 </td>
+                            <td class="small ">Class aptent taciti sociosqu  </td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ... volutpat lectus eu massa aliquam, 
+
+                                            Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
+
+ 
+
+In vitae lacinia magna <span class="texto-resultado-busca">Lorem</span> em 
+
+
+Mauris laoreet porta odio a gravida. Pellentesque habitant morbi
+
+Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. 
+orbi tristique sen.
+consectetur tortor arcu, a molestie mi porttitor vel. 
+
+Etiam volutpat lectus eu massa aliquam, vitae accumsan nulla maximus. Praesent fermentum, urna in auctor imperdiet, sa 
+
+f...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://pt.lipsum.com//teste/pdf/00003.pdf' target="_blank">
+                                    Ccc
+                                </a>
+                            </td>
+                            <td class="small "><a href="https://pt.lipsum.com/" >000/000/03</a>
+                            <td class="small ">03/03/2023 </td>
+                            <td class="small "> </td>
+                            <td class="small ">Quisque nec ante eu lacus </td>
+                            <td class="small ">Lorem Ipsum 3  </td>
+                            <td class="small ">Non cursus erat </td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ...: Donec pretium, quam consectetur laoreet feugiat, 
+EXERCÍCIO:  XXXX
+INSTRUÇÃO POR: UR-20 
+PROCESSO(S) DEPENDENTES(S): 1245214ZZZZZ 
+ 
+
+ 
+
+ASSUNTO: Morbi tincidunt gravida vulputate. Nam sit amet tortor libero
+
+Phasellus interdum neque ullamcorper iaculis bibendum. Suspendisse dignissim molestie.
+ 
+
+Phasellus interdum neque ullamcorper iaculis bibendum. Suspendisse dignissim molestie <span class="texto-resultado-busca">Lorem</span> em 
+
+
+
+Duis congue magna lacinia elit congue aliquam. Cras dictum ac turpis ac mollis. 
+Suspendisse velit nibh, efficitur sit amet commodo a, posuere fringilla dui. Proin imperdiet, neque sed pellentesque gravida, massa nibh porta sem, a facilisis orci velit commodo lorem. Mauris vitae pulvinar tortor. Vivamus porttitor diam ut ultrices convallis. Pellentesque bibendum ex quis sem egestas viverra id accumsan nulla.
+
+Nam sollicitudin, lorem sed...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://pt.lipsum.com//teste/pdf/00004.pdf' target="_blank">
+                                    DDD
+                                </a>
+                            </td>
+                            <td class="small "><a href=https://pt.lipsum.com/" >000/000/04</a>
+                            <td class="small ">04/04/2023 </td>
+                            <td class="small ">Aenean blandit gravida imperdiet </td>
+                            <td class="small ">Fusce risus metus... </td>
+                            <td class="small ">Phasellus non nibh </td>
+                            <td class="small ">Enean blandit gra... </td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            .... 13. Cras dictum ac turpis ac mollis. Suspendisse velit nibh, efficitur sit amet commodo a, posuere fringilla dui. Proin imperdiet, neque sed pellentesque gravida, massa nibh porta sem, a facilisis orci velit commodo lorem.
+
+[5] Lorem. Lei nº 00000,  egestas viverra id ac e 2021.
+Ut mattis tincidunt libero nec molestie.
+
+Phasellus non nibh quis ante lacinia interdum:
+[...]
+II -  Nam sollicitudin, lorem sed imperdiet vestibulum
+
+sem massa blandit est, ut vulputate erat mi eu urna. Duis laoreet euismod mollis. Fusce risus metus; [...]
+
+[6]
+
+Pellentesque porta a nisl vel vestibulum. Gaeco apura <span class="texto-resultado-busca">Lorem</span> de
+Maecenas non fermentum ex, ut scelerisque dolor....
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://pt.lipsum.com//teste/pdf/00004.pdf' target="_blank">
+                                    Eeee
+                                </a>
+                            </td>
+                            <td class="small "><a href="https://pt.lipsum.com/" >000/000/05</a>
+                            <td class="small ">05/05/2023 </td>
+                            <td class="small "> </td>
+                            <td class="small "> </td>
+                            <td class="small ">Fusce risus metus </td>
+                            <td class="small ">Maecenas non fermentum ex, ut scelerisque dolor... </td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ... Maecenas non fermentum.
+<span class="texto-resultado-busca">Lorem</span>
+
+ 
+
+Aenean blandit gravida imperdiet. Proin in fermentum felis. Nam magna lacus, feugiat sit amet ligula eu, dictum hendrerit sem. In consequat ac dui vel pretium. Integer eu nulla turpis. Donec non semper odio. Mauris vitae justo et tellus dapibus porttitor. Vestibulum metus mi, vulputate vel imperdiet id, laoreet nec neque. Nulla id diam turpis. Suspendisse vel massa augue. Cras ligula sapien, molestie ut luctus vel, elementum sed ipsum. Proin dignissim, dolor et auctor dignissim, eros tortor imperdiet elit, nec eleifend massa justo vitae mi.
+
+<span class="texto-resultado-busca">Lorem</span>.
+
+Aenean accumsan viverra magna. Donec facilisis tristique bibendum. Donec dignissim interdum est, at auctor urna dictum a. Morbi rutrum tortor quis odio congue sodales vel at ligula. Donec dignissim lectus sem, eget mollis enim vestibulum vitae. Nam ornare erat ut leo consequat, ut ornare dui ornare. Mauris pellentesque ut lorem nec condimentum.
+
+ao  par  ao i...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://pt.lipsum.com/pdf/20hfhddhd.pdf' target="_blank">
+                                    FFF
+                                </a>
+                            </td>
+                            <td class="small "><a href="https://pt.lipsum.com/" >000/000/06</a>
+                            <td class="small ">06/06/2023 </td>
+                            <td class="small "> Donec mollis nunc leo </td>
+                            <td class="small ">Donec ex dui... </td>
+                            <td class="small ">Nunc eu enim </td>
+                            <td class="small "> Cras vestibulum, velit mattis luctus novemb... </td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sed ut turpis augue
+
+Sed ut turdsfsfpis augue
+(11) 000001--0144 - gcder@tdaf.csd
+
+D D D P A C Z O
+
+ 
+
+PROCESSO: 000001-0417448
+
+
+Ut scelerisque augue sem, eget egestas leo auctor sed. Pellentesque a mi a tellus dapibus dignissim. Sed faucibus fermentum consequat. Etiam ipsum lectus, congue at elit sit amet, consequat ultricies nulla. Sed dictum nibh in sodales consequat. Ut vitae pretium velit, at auctor lectus. Nunc non libero eu risus dictum elementum. Etiam nec vulputate est. Nunc dignissim et nulla in eleifend. Integer nisl ligula, pellentesque in fringilla in, finibus eu ante. Quisque efficitur at neque at sodales.<span class="texto-resultado-busca">Lorem</span> 
+onsequat ultricies nulla
+Nibh in sodales consequa...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href=https://pt.lipsum.com/.pdf' target="_blank">
+                                    ZZZ
+                                </a>
+                            </td>
+                            <td class="small "><a href="https://pt.lipsum.com/" >000/000/07</a>
+                            <td class="small ">07/07/2023 </td>
+                            <td class="small ">LUIZSSA MSAEORE </td>
+                            <td class="small ">CIDDAA DQE SANEDFAFAMENTO BCO... </td>
+                            <td class="small ">Pellentesque </td>
+                            <td class="small ">Apntoa supdfs irrefsfgulasf ridadessf dufsfrante a ... </td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ... senectus et netus et malesuada 
+. Fames ac turpis egestas. In mi neque,
+Aliquam nisi turpis, aliquam et lobortis vel, molestie sit amet tortor. Nulla non nisl ut nulla pharetra finibus. Curabitur rutrum odio vitae libero gravida interdum in sit amet lorem. Duis id placerat neque, eu convallis
+
+ 
+EMENDATA: REPRFSFÇÃO. LIFSAÇÃO. PARTFSSFETÇÃO DETR 
+EMFSDFS CJUJFSS SÓCIJFELOS TUM RELAÇHFO DE PMARENTELJSCO. 
+AUVXCIA DE VÇÃO LEVXL. AUSÊVDE INDÍCMJ DE 
+<span class="texto-resultado-busca">Lorem</span>. NBD PROVFTE. 
+ 
+
+Quisque scelerisque odio at risus dignissim, volutpat efficitur justo placerat...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://jurisprudencia.tce.sp.gov.br/arqsGJ_juGDi/pdf/9KHH.pdf' target="_blank">
+                                    Despacho
+                                </a>
+                            </td>
+                            <td class="small "><a href="https://pt.lipsum.com/" >000/000/08</a>
+                            <td class="small ">08/08/2023 </td>
+                            <td class="small "> </td>
+                            <td class="small ">Cras eget tristique mauris</td>
+                            <td class="small ">Cugstgk </td>
+                            <td class="small "> Urabitur eget placerat</td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ... hftttttttttyuyr-<span class="texto-resultado-busca">Lorem</span>-em-cortor, egestas ultricies odio.  
+
+
+https://hhggkkp.br/w/mpsp-dhao-com-objjhdegr-<span class="texto-resultado-busca">Lorem</span>-em-contrem-cortor, egestas ultricies odio.
+
+
+ 
+
+ 
+
+ 
+
+  
+ 
+
+___________________________________________________________________________________________________  
+ 
+
+Nulla facilisi. Morbi et pretium turpis. Curabitur eget placerat tortor, egestas ultricies odio. Sed molestie tellus eu lorem pellentesque, at dignissim nunc iaculis. Vivamus aliquet nisi sit amet sapien vehicula, ac malesuada dui molestie. Quisque id sagittis est. Nulla purus est, varius vel velit in, blandit maximus enim. Aliquam erat volutpat. Morbi fringilla hendrerit metus id auctor. Morbi eget leo eget enim tincidunt sodales pretium id lectus. Donec ultricies, diam et bibendum egestas, nisi nunc ultrices lacus, eu lacinia lacus massa ac est. Mauris nisi nibh, accumsan at pretium a, auctor eget justo.
+4) Fofsfsos...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://pt.lipsum.com/teste/pdf/2001.pdf' target="_blank">
+                                    WWW
+                                </a>
+                            </td>
+                            <td class="small "><a href="https://pt.lipsum.com/" >000/000/09</a>
+                            <td class="small ">09/09/2023 </td>
+                            <td class="small ">Suspendisse consectetu </td>
+                            <td class="small ">Nunc elementum... </td>
+                            <td class="small ">Fusce eget dui felis. </td>
+                            <td class="small ">Nulla non nisl ut nulla  09 je novemb... </td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ... 026/2023 - FVGA, de 0X de
+novembro de 2023.
+Quisque id sagittis est. Nulla purus est, varius vel velit in, blandit maximus enim. Aliquam erat volutpat. Morbi fringilla hendrerit metus id auctor. Morbi eget leo eget enim tincidunt sodales pretium id lectus.
+<span class="texto-resultado-busca">Lorem</span>
+Sed rhoncus tellus diam, in tempor erat auctor at. Suspendisse consectetur felis at fermentum tristique. Nunc elementum, tellus nec malesuada tincidunt, metus tellus semper purus, vel semper mi eros et sapien. Fusce eget dui felis. In blandit cursus metus, lacinia luctus nisi. Fusce placerat lacus ac
+
+RCÍCIO: 2023
+estie tellus eu lorem pellentesque, at dignissim nunc iaculis. Vivamus...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://pt.lipsum.com/testes/pdf/vn8726.pdf' target="_blank">
+                                    YYY
+                                </a>
+                            </td>
+                            <td class="small "><a href="https://pt.lipsum.com/" >000/000/10</a>
+                            <td class="small ">10/10/2023 </td>
+                            <td class="small ">Suspendisse venenatis </td>
+                            <td class="small ">Donec tincidunt interdum... </td>
+                            <td class="small ">Pellentesque habitant </td>
+                            <td class="small ">MAGNA Nº 026/2023 - GVQA, de 0D de novemb... </td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ... 04560/2023 - GPAGA, de 09 de
+commodo de 2023.
+ASSUNTO: Phasellus vitae elit et
+Vestibulum porta urna sit amet quam blandit suscipit
+Duis tristique aliquet tempor
+invcios de <span class="texto-resultado-busca">Lorem</span> Maecenas at arcu mi. 
+Duis sit amet ipsum sed ligula scelerisque eleifend. Duis ornare elementum urna, suscipit pretium turpis. Nullam luctus odio nulla, in pellentesque ipsum pretium in. Morbi quis porta ligula. Sed eget mollis lectus.
+
+EXERCÍCIO: 2023
+
+ 
+
+Sed euismod neque felis, quis convallis quam fringilla id. In nunc lectus, sodales sit amet lobortis nec, ultricies a augue. Suspendisse potenti. Orci varius natoque penatibus et magnis dis parturient montes, nasce
+
+
+Unc tempus ven<span class="texto-resultado-busca">Lorem</span>...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                    
+                        <tr class="borda-superior">
+                            <td class="small " colspan="8"></td>
+                        </tr>
+                    
+
+                </tbody>
+            </table>
+
+            <!-- barra de paginação -->
+            <nav aria-label="...">
+                <ul class="pagination pagination-sm">
+
+                    
+
+                    <!-- Offset 0 não aparece o anterior-->
+                    
+
+                    
+
+                    
+
+                        
+
+                        
+                            
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        1
+                                        <span class="sr-only">(current)</span>
+                                    </span>
+                                </li>
+                            
+                            
+                        
+                    
+
+                        
+
+                        
+                            
+                            
+                                <li class="page-item">
+                                    <a class="page-link " href='https://pt.lipsum.com/'>
+                                        2
+                                    </a>
+                                </li>
+                            
+                        
+                    
+
+                        
+
+                        
+                            
+                            
+                                <li class="page-item">
+                                    <a class="page-link " href='https://pt.lipsum.com/'>
+                                        3
+                                    </a>
+                                </li>
+                            
+                        
+                    
+
+                        
+
+                        
+                            
+                            
+                                <li class="page-item">
+                                    <a class="page-link " href='https://pt.lipsum.com/'>
+                                        4
+                                    </a>
+                                </li>
+                            
+                        
+                    
+
+                        
+
+                        
+                            
+                            
+                                <li class="page-item">
+                                    <a class="page-link " href='https://pt.lipsum.com/'>
+                                        5
+                                    </a>
+                                </li>
+                            
+                        
+                    
+
+                        
+
+                        
+                            
+                            
+                                <li class="page-item">
+                                    <a class="page-link " href='https://pt.lipsum.com/'>
+                                        6
+                                    </a>
+                                </li>
+                            
+                        
+                    
+
+                    
+
+                    <!-- Enquanto a pagina atual é menor o que máximo.... exibe o próximo -->
+                    
+                        
+                        <li class="page-item">
+                          <a class="page-link" href='https://pt.lipsum.com/'><span class="glyphicon glyphicon-forward"></span></a>
+                        </li>
+                    
+
+                    
+
+                </ul>
+            </nav>
+
+            <br/>
+
+            
+
+                <form action="pesquisar" class="form-group">
+                    <div class="col-md-5">
+                        <input type="submit" value="<< Pesquisa Avançada" class="btn btn-info"/>
+                        <input type="hidden" name="acao" value="Pesquisar">
+                    </div>
+                </form>
+
+            
+
+        
+
+
+
+
+  </body>
+
+
+</html>

@@ -3,12 +3,12 @@ import database, utils
 
 db_name = "Turivius"
 periodo = [2023]
-pesquisa = "Fraudes Maua"
+pesquisa = "Fraudes"
 # pesquisa = "SERRAAESTRELLLA"
 
 # Para iniciar a Raspagem
 lista, dados_brutos = utils.requests_tce(pesquisa, periodo)
-print(lista)
+# print(lista)
 
 # Para criar/Conectar o Banco de Dados
 # engine = database.create_db(db_name)
@@ -22,3 +22,6 @@ print(lista)
 
 # Para gerar o arquivo JSON com os dados Brutos
 utils.convert_json(dados_brutos)
+
+
+#### VERIFICAR a necessidade do arquivo tce_sp
