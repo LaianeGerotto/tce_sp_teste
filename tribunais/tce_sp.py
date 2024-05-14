@@ -1,145 +1,206 @@
-import requests
+from requests import Session
 from bs4 import BeautifulSoup
 import re
 import math
 import json
-
-URL = "https://www.tce.sp.gov.br/jurisprudencia/"
-
-
-def listaChaves(home_page):
-    chaves = home_page.find_all("th", class_="alinhamento")
-    lista_chaves = []
-    for i in chaves:
-        chave = i.get_text("", strip=True)
-        lista_chaves.append(chave)
-    return lista_chaves
+from datetime import datetime
 
 
-def get_documentos(home_page, lista_documentos, lista_chaves):
-    documentos = home_page.find_all("tr", class_="borda-superior")
+class TceSp:
+    def __init__(self, pesquisa: any, periodo: list[int]):
+        self.pesquisa = pesquisa
+        self.periodo = periodo
+        self.url = "https://www.tce.sp.gov.br/jurisprudencia/"
+        self.session = Session()
+        self.session.headers.update(
+            {
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            }
+        )
 
-    for i in documentos:
-        dict_documentos = {}
-        lista_valores = []
-        itens = i.find_all(True)
-        for j in itens:
-            if len(j.contents) == 0:
-                continue
-            valor = j.get_text(" ", strip=True)
-            if len(j) > 3:  # Necessario para limitar a td ref. ao numero do processo
-                valor = j.contents[0].get_text()
-            if j.find("a") and j.a.has_attr("href"):
-                link = j.a["href"]
-                if not link.startswith("https://www.tce.sp.gov.br"):
-                    link = "https://www.tce.sp.gov.br/jurisprudencia/" + link
-                valor = {"nome": valor, "link": link}
-            lista_valores.append(valor)
-            dict_documentos = dict(list(zip(lista_chaves, lista_valores)))
-        if len(dict_documentos) > 1:
-            conteudo = (
-                i.find_next("tr")
-                .find("ul")
-                .get_text("", strip=True)
-                .replace("\n", "")
-                .replace("  ", " ")
-            )
-            dict_documentos["Conteudo"] = conteudo
-            dict_documentos["Tribunal"] = "tce_sp"
+    # FUNÇĀO PARA VERIFICAR O PERIODO/INTERVALO DA BUSCA
+    def validacao_periodo(self):
+        if not self.periodo:
+            return False
+        try:
+            for i in self.periodo:
+                i = int(i)
+                if len(str(i)) != 4 or type(i) is not int:
+                    print(f"Periodo Inválido {self.periodo}")
+                    return False
+        except Exception as err:
+            print(err)
+            return False
+        return True
 
-            lista_documentos.append(dict_documentos)
+    # FUNÇĀO PARA EXTRAIR AS CHAVES DOS DOCUMENTOS
+    def listaChaves(self, home_page):
+        chaves = home_page.find_all("th", class_="alinhamento")
+        lista_chaves = []
+        for i in chaves:
+            chave = i.get_text("", strip=True)
+            lista_chaves.append(chave)
+        return lista_chaves
 
-    return lista_documentos
+    # FUNCAO PARA EXTRAIR OS DOCUMENTOS
+    def get_documentos(self, home_page, lista_chaves, lista_documentos):
+        documentos = home_page.find_all("tr", class_="borda-superior")
+        for i in documentos:
+            dict_documentos = {}
+            lista_valores = []
+            itens = i.find_all("td")
+            for j in itens:
+                if len(j.contents) == 0:
+                    continue
+                valor = j.get_text(" ", strip=True)
+                if (
+                    len(j) > 3
+                ):  # Necessario p/ limitar a tag td ref. ao numero do processo
+                    valor = j.contents[0].get_text()
+                if j.find("a") and j.a.has_attr("href"):
+                    link = j.a["href"]
+                    if not link.startswith("https://jurisprudencia.tce.sp.gov.br"):
+                        link = "https://www.tce.sp.gov.br/jurisprudencia/" + link
+                    valor = {"nome": valor, "link": link}
+                lista_valores.append(valor)
 
+                dict_documentos = dict(list(zip(lista_chaves, lista_valores)))
+            if len(dict_documentos) > 1:
+                conteudo = i.find_next("tr").find("ul")
+                if conteudo:
+                    conteudo = (
+                        conteudo.get_text(" ", strip=True)
+                        .replace("\n", "")
+                        .replace("  ", " ")
+                        .upper()
+                    )
 
-def requests_tce(pesquisa, periodo):
+                dict_documentos["Conteudo"] = conteudo
+                dict_documentos["Tribunal"] = "tce_sp"
+                lista_documentos.append(dict_documentos)
 
-    session = requests.Session()
+        return lista_documentos
 
-    session.headers.update(
-        {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        }
-    )
-
-    response = session.get(URL)
-    print(response)  # Remover e inserir tratamento de erro
-
-    parametros = {
-        "txtTdPalvs": pesquisa,
-        "txtExp": "",
-        "txtQqUma": "",
-        "txtNenhPalvs": "",
-        "txtNumIni": "",
-        "txtNumFim": "",
-        "tipoBuscaTxt": "Documento",
-        "_tipoBuscaTxt": "on",
-        "quantTrechos": 1,
-        "processo": "",
-        "exercicio": periodo,
-        "dataAutuacaoInicio": "",
-        "dataAutuacaoFim": "",
-        "dataPubInicio": "",
-        "dataPubFim": "",
-        "_relator": 1,
-        "_auditor": 1,
-        "_materia": 1,
-        "_tipoDocumento": 1,
-        "acao": "Executa",
-    }
-
-    response_doc = session.get(URL + "pesquisar", params=parametros)
-
-    print(response_doc)  # Remover e inserir tratamento de erro
-    home_page = BeautifulSoup(response_doc.content, "html.parser")
-
-    qtde_registros = home_page.find("h3", class_="nopadding").text
-    print(qtde_registros)
-
-    # DO Preparar o Script para ausencia de dados
-
-    # paginacao = home_page.find("a", class_="page-link pn prev")
-    # if not paginacao:
-    # #     paginacao = home_page.find_all("li", class_="page-item")[-2]
-    # #     paginacao = paginacao.find("a").get("href")
-    paginas = re.search("Foram encontrados (\d+) registros", qtde_registros)
-
-    # paginas = re.search("offset=(\d+)", paginacao)
-    if paginas:
-        paginas = int(paginas.group(1))
-        total_paginas = math.ceil(paginas / 10)  # Melhorar
-
-    lista_chaves = listaChaves(home_page)
-    print(lista_chaves)
-
-    # Raspagem dos documentos/processos
-
-    lista_documentos = []
-
-    lista_documentos = get_documentos(home_page, lista_documentos, lista_chaves)
-    if total_paginas > 1:
+    # FUNCAO PARA PERCORRER AS PAGINAS
+    def percorrer_paginas(self, total_paginas, lista_documentos, lista_chaves):
         i = 1
         while i <= (total_paginas - 1):
-            response_doc = session.get(
-                URL + "pesquisar", params={"acao": "Executa", "offset": i * 10}
+            print(f"Pagina Atual {i}")
+            response_doc = self.session.get(
+                self.url + "pesquisar/", params={"acao": "Executa", "offset": i * 10}
             )
-            # tratamento para status code
-            if response_doc.status_code != 200:
-                print(f"Erro: {response_doc.status_code}")
-                break
-            home_page = BeautifulSoup(response_doc.content, "html.parser")
 
-            get_documentos(home_page, lista_documentos, lista_chaves)
+            if response_doc.status_code != 200:
+                response_doc.raise_for_status()
+
+            home_page = BeautifulSoup(response_doc.content, "html.parser")
+            self.get_documentos(home_page, lista_chaves, lista_documentos)
             i = i + 1
 
-    print(lista_documentos)
+        return lista_documentos
 
-    conteudo_json = json.dumps({pesquisa: lista_documentos}, ensure_ascii=False)
+    # FUNÇĀO PARA INICIAR A EXTRAÇĀO DOS DADOS
+    def requests_tce(self) -> list:
 
-    return conteudo_json
+        # Validar o Periodo para evitar dados extras
+        if self.validacao_periodo() == False:
+            raise Exception("Periodo inválido")
 
+        response = self.session.get(self.url)
+        if response.status_code != 200:
+            response.raise_for_status()
 
-# Inserir informativo se todos dos registros foram inseridos = Total de registro encontrados x len(lista_documentos)
+        parametros = {
+            "txtTdPalvs": self.pesquisa,
+            "txtExp": "",
+            "txtQqUma": "",
+            "txtNenhPalvs": "",
+            "txtNumIni": "",
+            "txtNumFim": "",
+            "tipoBuscaTxt": "Documento",
+            "_tipoBuscaTxt": "on",
+            "quantTrechos": 1,
+            "processo": "",
+            "exercicio": self.periodo,
+            "dataAutuacaoInicio": "",
+            "dataAutuacaoFim": "",
+            "dataPubInicio": "",
+            "dataPubFim": "",
+            "_relator": 1,
+            "_auditor": 1,
+            "_materia": 1,
+            "_tipoDocumento": 1,
+            "acao": "Executa",
+        }
 
-# VER SOBRE POSSIVEL IMPLEMENTACAO: Um dos links direciona para outra pagina que contem outros documentos para download
+        response_doc = self.session.get(self.url + "pesquisar", params=parametros)
+        if response_doc.status_code != 200:
+            response_doc.raise_for_status()
+
+        home_page = BeautifulSoup(response_doc.content, "html.parser")
+
+        # Verifica se a pagina possui alguma mensagem erro/alerta
+        mensagem = home_page.find("div", class_="alert alert-info")
+        if mensagem:
+            raise Exception(mensagem.get_text(" ", strip=True))
+
+        qtde_registros = home_page.find("h3", class_="nopadding").text
+        print(qtde_registros)  # Quantidade de registros encontrados
+
+        paginas = re.search("Foram encontrados (\d+) registros", qtde_registros)
+
+        # Cálculo para o Total de páginas
+        if paginas:
+            paginas = int(paginas.group(1))
+            total_paginas = math.ceil(paginas / 10)  # Melhorar
+
+        lista_chaves = self.listaChaves(home_page)
+        lista_documentos = []
+        self.get_documentos(home_page, lista_chaves, lista_documentos)
+        # Trecho para percorrer as outras páginas
+        if total_paginas > 1:
+            self.percorrer_paginas(total_paginas, lista_documentos, lista_chaves)
+
+        # Verificar se a quantidade de documentos extraidos é igual a quantidade encontrada na Busca.
+        if len(lista_documentos) != paginas:
+            raise Exception(
+                f"Foram extraídos {len(lista_documentos)}/{paginas} documentos."
+            )
+
+        # Salva os dados Brutos em outra variavel para uma possível conversão arquivo JSON.
+        conteudo_json = lista_documentos
+
+        # Limpeza/Tratamento dos Dados Brutos que nāo serāo utilizados no Banco de Dados
+        processos = self.tratamento_dados_brutos(lista_documentos)
+        print(f"Total de Processos/Documentos Capturados foram {len(processos)}")
+        return processos, conteudo_json
+
+    # TRATAMENTO DOS DADOS BRUTOS
+    def tratamento_dados_brutos(self, lista_documentos: list[dict]) -> list:
+        processos = []
+        for i in lista_documentos:
+            info = {
+                "doc": i.get("Doc.")["nome"],
+                "link": i.get("Doc.")["link"],
+                "n_processo": i.get("N° Proc.")["nome"],
+                "data_autuacao": datetime.strptime(
+                    i.get("Autuação"), "%d/%m/%Y"
+                ).date(),
+                "materia": i.get("Matéria"),
+                "ementa": i.get("Conteudo"),
+                "tribunal": i.get("Tribunal"),
+            }
+
+            partes = [{"parte": i["Parte 1"]}, {"parte": i["Parte 2"]}]
+            processo = {"processo": info, "partes": partes}
+            processos.append(processo)
+
+        return processos
+
+    # FUNÇĀO PARA CONVERTER A LISTA PARA JSON E ARMAZENAR NA MEMÓRIA
+    def convert_json(conteudo_json: list):
+        with open("dados.json", "w") as arquivo:
+            json.dump(
+                {"Documentos": conteudo_json}, arquivo, indent=2, ensure_ascii=False
+            )
