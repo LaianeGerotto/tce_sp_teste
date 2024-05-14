@@ -15,3 +15,14 @@ services:
     command: python main.py
     depends_on: 
       - mysql
+      - elasticsearch
+
+  elasticsearch:
+    image: elasticsearch:8.13.4
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+      
+    environment:
+      - "discovery.type=single-node"
+      - "xpack.security.enabled=false"

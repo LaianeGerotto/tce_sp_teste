@@ -1,0 +1,591 @@
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pesquisa de Jurisprud&ecirc;ncia</title>
+    <meta name="layout" content="main" />
+
+    <script src="/jurisprudencia/res/js/jquery-3.1.0.min.js"/></script>
+    <script src="/jurisprudencia/res/js/jquery-ui.min.js"/></script>
+    <script src="/jurisprudencia/res/js/jquery-datePicker-pt-BR.js"/></script>
+    <script src="/jurisprudencia/res/js/jquery.mask.min.js"/></script>
+    <link href="/jurisprudencia/res/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/css/main.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/css/jquery-ui.min.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/img/favicon.ico" rel="icon">
+    <script src="/jurisprudencia/res/iframe-resizer-master/js/iframeResizer.contentWindow.min.js"/></script>
+
+    <!-- Componentes JS externos -->
+    <link href="/jurisprudencia/res/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/jurisprudencia/res/select2-4.0.5/css/select2.min.css" rel="stylesheet">
+    <script src="/jurisprudencia/res/select2-4.0.5/js/select2.min.js"></script>
+
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+
+	<style>
+
+
+        a:visited {
+            color: rgb(170,43,43);
+        }
+
+        .alinhamento{
+            vertical-align: middle !important;
+        }
+
+        tbody:before {
+            content: "-";
+            display: block;
+            line-height: 1em;
+            color: transparent;
+        }
+
+        .nopadding {
+            //padding: 0px !important;
+            padding-left: 0px !important;
+            padding-right: 0px !important;
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+            margin: 0px !important;
+            margin-top: 0px !important;
+            margin-left: 0px !important;
+            margin-bottom: 0px !important;
+        }
+
+        .borda-superior{
+            background: #f5f5f5;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .borda-cabecalho  th{
+            border-top: 1px solid #777 !important;
+            border-bottom: 1px solid #777 !important;
+        }
+
+        .link-cabecalho {
+            color:#333 !important;
+            font-size: 85%;
+            font-weight: bold;
+        }
+
+        .texto-resultado-busca{
+            background: #ffffdb;
+            padding: 2px 4px;
+            border: 1px solid #ccccaa;
+        }
+
+        .label-texto {
+            display: inline-block;
+            max-width: 100%;
+            /* margin-bottom: 5px; */
+            font-weight: 700;
+        }
+
+        .table-docs {
+            border-collapse: collapse;
+        }
+
+        .titulo-tabela {
+            background-color: #ddd;
+        }
+
+        .titulo-tabela {
+            background-color: #ddd;
+        }
+
+        .titulo-trechos {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+
+        .small .sem-borda {
+            padding: 10px 10px 10px 50px;
+        }
+
+        .trechos-documento {
+            margin: 10px 0px 30px 0px !important;
+            list-style: none;
+            padding-left: 0px;
+        }
+
+        ul.trechos-documento li {
+            text-align: justify;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+            background: #fafafa;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .largura{
+            width: 100%;
+            padding
+        }
+
+        .largura-label{
+            width: 0%;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .date {
+            width: 250px;
+        }
+
+        .comboNumber {
+            width: 100px;
+        }
+
+        .date_50p {
+            width: 100%;
+        }
+
+        .margemCheckbox {
+            margin: 10px 5px 2px 40px !important;
+        }
+
+        .checkbox-ajuste-horizontal {
+            margin-left: -40px;
+        }
+
+	</style>
+	
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body class="nopadding largura">
+
+<!-- INICIO Parte do Cabeçalho TCESP-->
+
+
+
+        
+
+        <div class="navbar-form container" style="margin-left: 0px">
+
+        <script>
+
+            function submitFiltroPesqRapida(formulario){
+                document.getElementById("acao").value = "Executa";
+                document.getElementById("buscaRapida").value = "true";
+                document.getElementById("ignorarEntrada").value = "false";
+                return true;
+            }
+
+            function submitFiltroAvancada(){
+                document.getElementById("acao").value = "Pesquisar";
+                document.getElementById("buscaRapida").value = "false";
+                document.getElementById("ignorarEntrada").value = "true";
+                return true;
+            }
+
+        </script>
+
+        <form id="filtro" name="filtro" action="pesquisar" method="get">
+
+                <!-- Grupo Todas Palavras -->
+                <div class="pull-left row">
+
+                    <label class="control-label" style="" >Buscar por palavras:</label>
+                    <input type="text" name="txtTdPalvs" value='Fraudes em Escolas'  class="form-control" maxlength="1024" placeHolder="Exemplo: Merenda Escolar fraude" style="margin-right: 25px" />
+
+                    <label class="control-label " style="">N&deg; Processo:</label>
+                    <input type="text" name="processo" id="processo" value=""  class="form-control" maxlength="15" placeHolder="Exemplo: 1023/026/17 " style="margin-right: 25px"/>
+
+                    <input type="hidden" id="acao" name="acao" value="Executa">
+                    <input type="hidden" id="buscaRapida" name="buscaRapida" value="true">
+                    <input type="hidden" id="ignorarEntrada" name="ignorarEntrada" value="false">
+
+                    <input type="submit" value="Pesquisa R&aacute;pida"  class="btn btn-info" onclick="submitFiltroPesqRapida(this)"/>
+                    <input type="submit" value="<< Pesquisa Avan&ccedil;ada"  class="btn btn-info"onclick="submitFiltroAvancada(this)"/>
+
+            <script>
+                $( function() {
+                    $('#processo').mask('######/###/##', {reverse: true});
+                } );
+            </script>
+
+                </div>
+        </form>
+</div>
+
+<div style="clear: both"></div>
+
+
+        
+            <div class="page-header largura">
+                <h3 class="nopadding">Foram encontrados 2 registros</h3>
+            </div>
+        
+
+        </br>
+
+        
+
+        
+        <div class="text-center alert alert-warning largura" role="alert">
+    <h5>O resultado aqui apresentado possui car&aacute;ter meramente informativo, n&atilde;o se prestando para contagem de quaisquer prazos processuais.</h5>
+</div>
+
+        
+
+        <!--
+        <form action="pesquisar" class="form-group">
+            <div class="col-md-5">
+                <input type="submit" value="<< Pesquisa Avançada" class="btn btn-info"/>
+                <input type="hidden" name="acao" value="Pesquisar">
+            </div>
+        </form> -->
+
+
+        
+
+            <table class="table largura table-docs">
+
+                <thead class="titulo-tabela borda-cabecalho">
+                    <tr >
+                        <th width="8%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                        /jurisprudencia/pesquisar?acao=Executa&offset=0&campoPulsaOrdem=0 >
+                                Doc.<span class="fa fa-sort"></span> </a>
+                            
+                            
+                        </th>
+
+                        <th width="9%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                    /jurisprudencia/pesquisar?acao=Executa&offset=0&campoPulsaOrdem=1 >
+                                N&deg; Proc.<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+
+                        <th width="10%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                    /jurisprudencia/pesquisar?acao=Executa&offset=0&campoPulsaOrdem=2 >
+                                Autuação<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+                        <th width="15%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                    /jurisprudencia/pesquisar?acao=Executa&offset=0&campoPulsaOrdem=3 >
+                                Parte 1<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+                        <th width="15%"class=" alinhamento">
+
+                            
+                                <a class="link-cabecalho" href=
+                                    /jurisprudencia/pesquisar?acao=Executa&offset=0&campoPulsaOrdem=4 >
+                                Parte 2<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+
+                        <th width="15%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                    /jurisprudencia/pesquisar?acao=Executa&offset=0&campoPulsaOrdem=5 >
+                                Matéria<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+
+                        <th width="19%" class=" alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                    /jurisprudencia/pesquisar?acao=Executa&offset=0&campoPulsaOrdem=6 >
+                            Objeto<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+
+                        <th class="alinhamento">
+                            
+                                <a class="link-cabecalho" href=
+                                    /jurisprudencia/pesquisar?acao=Executa&offset=0&campoPulsaOrdem=7 >
+                                Exercício<span class="fa fa-sort"></span></a>
+                            
+                            
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://jurisprudencia.tce.sp.gov.br/arqs_juri/pdf/20008081.pdf' target="_blank">
+                                    Despacho
+                                </a>
+                            </td>
+                            <td class="small "><a href="exibir?proc=7279/989/24&offset=0" >7279/989/24</a>
+                            <td class="small ">26/02/2024 </td>
+                            <td class="small ">FRANCISCO ALVES DA SILVA </td>
+                            <td class="small ">PREFEITURA MUNICIPAL DE AGU... </td>
+                            <td class="small ">ENCAMINHA DOCUMENTO </td>
+                            <td class="small ">Denúncia referente à fraude de dispensa de... </td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GABINETE DO 
+CONSELHEIRO
+
+ROBSON MARINHO
+(11) 3292-3521 - gcrrm@tce.sp.gov.br
+
+D E S P A C H O
+
+ 
+
+PROCESSO: 00007279.989.24-8
+
+REQUERENTE
+/SOLICITANTE:
+
+FRANCISCO ALVES DA SILVA (CPF ***.
+326.188-**)
+
+ADVOGADO: ANDRESSA FRANCIELI
+GONCALVES DE SOUZA (OAB/SP
+412.667)
+
+MENCIONADO(A): PREFEITURA MUNICIPAL DE AGUAS DA
+PRATA (CNPJ 44.831.733/0001-43)
+
+ASSUNTO: Denúncia referente à <span class="texto-resultado-busca">fraude</span> de dispensa de
+licitação, para CONTRATAÇÃO DE EMPRESA
+PARA EXECUÇÃO DE SERVIÇOS DE
+REGULARIZAÇÃO DE PISO NA <span class="texto-resultado-busca">ESCOLA</span>
+FELIPE URTADO NO DISTRITO DE SÃO
+ROQUE DA FARTURA, na Prefeitura de Águas
+da Prata. Inclui contratado pré-definido, início da
+obra antes do contrato, empenho...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                        <tr class="borda-superior">
+                            <td class="small ">
+                                <a href='https://jurisprudencia.tce.sp.gov.br/arqs_juri/pdf/932748.pdf' target="_blank">
+                                    Despacho
+                                </a>
+                            </td>
+                            <td class="small "><a href="exibir?proc=15595/989/23&offset=0" >15595/989/23</a>
+                            <td class="small ">01/08/2023 </td>
+                            <td class="small ">FRANCISCO ALVES DA SILVA </td>
+                            <td class="small ">PREFEITURA MUNICIPAL DE AGU... </td>
+                            <td class="small ">ENCAMINHA DOCUMENTO </td>
+                            <td class="small ">ASSUNTO: Denúncia referente à indícios de ... </td>
+                            <td class="small">2023 </td>
+                        </tr>
+
+                        
+                            <tr><td  colspan=8>
+                                <div class="titulo-trechos">Trechos localizados no documento: </div>
+                                <ul class="trechos-documento">
+                                    
+                                        <li>
+                                            ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+21/09/2023, 11:31 e-processo.tce.sp.gov.br/e-tcesp/listagens/DownloadArquivo?vis&arquivo=8133236
+
+https://e-processo.tce.sp.gov.br/e-tcesp/listagens/DownloadArquivo?vis&arquivo=8133236 1/2
+
+D E S P A C H O
+
+ 
+
+PROCESSO: 00015595.989.23-7
+REQUERENTE/SOLICITANTE: FRANCISCO ALVES DA SILVA (CPF
+
+***.326.188-**)
+ADVOGADO: ANDRESSA
+FRANCIELI GONCALVES DE
+SOUZA (OAB/SP 412.667)
+
+MENCIONADO(A): PREFEITURA MUNICIPAL DE
+AGUAS DA PRATA (CNPJ
+44.831.733/0001-43)
+
+ASSUNTO: ASSUNTO: Denúncia referente à
+indícios de <span class="texto-resultado-busca">fraude</span> à licitação na carta
+convite nº. 003/2023, bem como de
+dispensas e pagamentos relacionados,
+da Prefeitura de Águas da Prata.
+
+EXERCÍCIO: 2023...
+                                        </li>
+                                    
+                                </ul>
+                            </td></tr>
+                        
+
+                    
+
+                    
+                        <tr class="borda-superior">
+                            <td class="small " colspan="8"></td>
+                        </tr>
+                    
+
+                </tbody>
+            </table>
+
+            <!-- barra de paginação -->
+            <nav aria-label="...">
+                <ul class="pagination pagination-sm">
+
+                    
+
+                    <!-- Offset 0 não aparece o anterior-->
+                    
+
+                    
+
+                    
+
+                        
+
+                        
+                            
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        1
+                                        <span class="sr-only">(current)</span>
+                                    </span>
+                                </li>
+                            
+                            
+                        
+                    
+
+                    
+
+                    <!-- Enquanto a pagina atual é menor o que máximo.... exibe o próximo -->
+                    
+
+                    
+
+                </ul>
+            </nav>
+
+            <br/>
+
+            
+
+        
+
+
+
+
+  </body>
+
+
+</html>

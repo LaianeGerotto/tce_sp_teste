@@ -12,7 +12,10 @@ pesquisa = "Fraudes em Escolas"
 # print(lista)
 
 tce = TceSp(pesquisa, periodo)
-dados, dados_brutos = tce.requests_tce()
+# dados, dados_brutos = tce.requests_tce()
+# print(dados)
+
+dados = tce.requests_tce()
 print(dados)
 
 # Para criar/Conectar o Banco de Dados

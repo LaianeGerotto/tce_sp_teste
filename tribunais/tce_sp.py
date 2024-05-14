@@ -71,7 +71,7 @@ class TceSp:
                 if conteudo:
                     conteudo = (
                         conteudo.get_text(" ", strip=True)
-                        .replace("\n", "")
+                        .replace("\n", " ")
                         .replace("  ", " ")
                         .upper()
                     )
