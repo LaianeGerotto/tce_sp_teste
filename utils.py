@@ -8,7 +8,7 @@ from datetime import datetime
 URL = "https://www.tce.sp.gov.br/jurisprudencia/"
 
 
-# FUNÇĀO PARA EXTRAIR AS CHAVES DOS DOCUMENTOS
+# FUNÇĀO PARA EXTRAIR AS CHAVES DOS DOCUMENTOS *********
 def listaChaves(home_page):
     chaves = home_page.find_all("th", class_="alinhamento")
     lista_chaves = []
@@ -18,6 +18,7 @@ def listaChaves(home_page):
     return lista_chaves
 
 
+# FUNCAO PARA EXTRAIR OS DOCUMENTOS ********
 def get_documentos(home_page, lista_chaves):
     documentos = home_page.find_all("tr", class_="borda-superior")
     lista_documentos = []
@@ -56,19 +57,7 @@ def get_documentos(home_page, lista_chaves):
     return lista_documentos
 
 
-# FUNÇĀO PARA VERIFICAR O PERIODO/INTERVALO DA BUSCA
-# def validacao_periodo(periodo: list[int]) -> list:
-#     if not periodo:
-#         raise Exception("Periodo nāo informado")
-
-#     for i in periodo:
-#         i = int(i)
-#         if len(str(i)) != 4 or type(i) is not int:
-#             print(type(i))
-#             raise Exception(f"Periodo Inválido {periodo}")
-
-
-# FUNÇĀO PARA VERIFICAR O PERIODO/INTERVALO DA BUSCA
+# FUNÇĀO PARA VERIFICAR O PERIODO/INTERVALO DA BUSCA *********
 def validacao_periodo(periodo: list[int]) -> list:
     if not periodo:
         return False
@@ -84,7 +73,7 @@ def validacao_periodo(periodo: list[int]) -> list:
     return True
 
 
-# FUNCAO PARA PERCORRER AS PAGINAS
+# FUNCAO PARA PERCORRER AS PAGINAS ******
 def percorrer_paginas(total_paginas, session, lista_documentos, lista_chaves):
     i = 1
     while i <= (total_paginas - 1):
@@ -102,7 +91,7 @@ def percorrer_paginas(total_paginas, session, lista_documentos, lista_chaves):
     return lista_documentos
 
 
-# FUNÇĀO PARA INICIAR A EXTRAÇĀO DOS DADOS
+# FUNÇĀO PARA INICIAR A EXTRAÇĀO DOS DADOS *****
 def requests_tce(pesquisa: any, periodo: list[int]) -> list:
 
     # Validar o Periodo para evitar dados extras
@@ -188,7 +177,7 @@ def requests_tce(pesquisa: any, periodo: list[int]) -> list:
     return processos, conteudo_json
 
 
-# TRATAMENTO DOS DADOS BRUTOS
+# TRATAMENTO DOS DADOS BRUTOS *****
 def tratamento_dados_brutos(lista_documentos: list[dict]) -> list:
     processos = []
     for i in lista_documentos:
@@ -209,7 +198,7 @@ def tratamento_dados_brutos(lista_documentos: list[dict]) -> list:
     return processos
 
 
-# FUNÇĀO PARA CONVERTER A LISTA PARA JSON E ARMAZENAR NA MEMÓRIA
+# FUNÇĀO PARA CONVERTER A LISTA PARA JSON E ARMAZENAR NA MEMÓRIA *****
 def convert_json(conteudo_json: list):
     with open("dados.json", "w") as arquivo:
         json.dump({"Documentos": conteudo_json}, arquivo, indent=2, ensure_ascii=False)

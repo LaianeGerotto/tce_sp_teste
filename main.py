@@ -1,35 +1,40 @@
-import database, utils
+from database_mysql import SgbdMysql
 from tribunais.tce_sp import TceSp
 
+from database_es import SgbdEs
 
-db_name = "Turivius"
-periodo = [2023]
-pesquisa = "Fraudes em Escolas"
-# pesquisa = "SERRAAESTRELLLA"
+db_name = "teste_mysql"  # Nome do Banco de Dados no Mysql
+es_name = "teste_elastic"  # Nome do index no Elasticsearch
 
-# Para iniciar a Raspagem
-# lista, dados_brutos = utils.requests_tce(pesquisa, periodo)
-# print(lista)
+pesquisa = "Fraudes em Escolas"  # Palavras chaves para a busca no site do TCE SP
+periodo = [2023]  # Periodo da Busca no site do TCE SP
 
+
+# INICIAR A EXTRAÇĀO DOS DADOS
 tce = TceSp(pesquisa, periodo)
-# dados, dados_brutos = tce.requests_tce()
-# print(dados)
+dados, dados_brutos = tce.requests_tce()
 
-dados = tce.requests_tce()
-print(dados)
-
-# Para criar/Conectar o Banco de Dados
-# engine = database.create_db(db_name)
+# PARA CRIAR/CONECTAR AO BANCO DE DADOS
+sgbd_mysql = SgbdMysql(db_name)
 
 # # Para Criar as Tabelas
-# table = database.create_table(engine)
+# PARA CRIAR AS TABELAS NO BANCO DE DADOS
+table = sgbd_mysql.criar_tabela()
 
-# # Para inserir os dados extraídos/tratados no Banco
-# database.insert_tables(engine, lista)
+
+# PARA INSERIR OS DADOS EXTRAÍDOS/TRATADOS NO BANCO DE DADOS - MYSQL
+lista_doc_mysql = sgbd_mysql.inserir_dados(dados)
 
 
 # Para gerar o arquivo JSON com os dados Brutos
 # utils.convert_json(dados_brutos)
 
 
-#### VERIFICAR a necessidade do arquivo tce_sp
+# PARA CONECTAR AO ELASTICSEARCH
+sgbd_es = SgbdEs(es_name)
+
+# PARA ACESSAR/CRIAR INDEX
+sgbd_es.acessar_index()
+
+# INSERIR DADOS ELASTICSEARH
+sgbd_es.inserir_dados(lista_doc_mysql)

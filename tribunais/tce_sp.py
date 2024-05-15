@@ -14,8 +14,10 @@ class TceSp:
         self.session = Session()
         self.session.headers.update(
             {
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
+                + "Chrome/124.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;"
+                + "q=0.8,application/signed-exchange;v=b3;q=0.7",
             }
         )
 
@@ -56,7 +58,7 @@ class TceSp:
                 valor = j.get_text(" ", strip=True)
                 if (
                     len(j) > 3
-                ):  # Necessario p/ limitar a tag td ref. ao numero do processo
+                ):  # Necessario p/ limitar a tag 'td' ref. ao numero do processo
                     valor = j.contents[0].get_text()
                 if j.find("a") and j.a.has_attr("href"):
                     link = j.a["href"]
@@ -76,13 +78,15 @@ class TceSp:
                         .upper()
                     )
 
-                dict_documentos["Conteudo"] = conteudo
+                dict_documentos["Conteudo"] = re.sub("[\ ]{2,}", "", conteudo).replace(
+                    "\xa0", " "
+                )
                 dict_documentos["Tribunal"] = "tce_sp"
                 lista_documentos.append(dict_documentos)
 
         return lista_documentos
 
-    # FUNCAO PARA PERCORRER AS PAGINAS
+    # FUNÇÃO PARA PERCORRER AS PAGINAS
     def percorrer_paginas(self, total_paginas, lista_documentos, lista_chaves):
         i = 1
         while i <= (total_paginas - 1):
@@ -102,8 +106,20 @@ class TceSp:
 
     # FUNÇĀO PARA INICIAR A EXTRAÇĀO DOS DADOS
     def requests_tce(self) -> list:
+        """
+        Função usa atributos da class TceSP para realizar a requisição
+        no site e para obter os documentos públicos disponíveis, retornando os dados extraídos.
 
-        # Validar o Periodo para evitar dados extras
+        Atributos:
+            pesquisa (str): Palavras chaves para a busca no site do TCE SP.
+            periodo (list[int]):  Periodo da Busca no site do TCE SP.
+
+        Returns:
+            List[dict]: Lista de Processos/Documentos com dados tratados.
+            List[dict]: Lista de Processos/Documentos com dados brutos.
+        """
+
+        # VALIDAR O PERIODO/ANO
         if self.validacao_periodo() == False:
             raise Exception("Periodo inválido")
 
@@ -158,6 +174,7 @@ class TceSp:
         lista_chaves = self.listaChaves(home_page)
         lista_documentos = []
         self.get_documentos(home_page, lista_chaves, lista_documentos)
+
         # Trecho para percorrer as outras páginas
         if total_paginas > 1:
             self.percorrer_paginas(total_paginas, lista_documentos, lista_chaves)
@@ -173,7 +190,7 @@ class TceSp:
 
         # Limpeza/Tratamento dos Dados Brutos que nāo serāo utilizados no Banco de Dados
         processos = self.tratamento_dados_brutos(lista_documentos)
-        print(f"Total de Processos/Documentos Capturados foram {len(processos)}")
+        print(f"Total de Processos/Documentos Capturados foram {len(processos)}.")
         return processos, conteudo_json
 
     # TRATAMENTO DOS DADOS BRUTOS
