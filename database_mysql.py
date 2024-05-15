@@ -78,7 +78,7 @@ class SgbdMysql:
     def select_dados(self, i):
         Session = sessionmaker(bind=self.engine)
         session = Session()
-        # session.select()
+
         query = session.query(Documento).where(
             Documento.n_processo == i["processo"]["n_processo"]
         )
@@ -87,20 +87,3 @@ class SgbdMysql:
         if documentos:
             return documentos[0][0].id
         return None
-
-        # teste = Documento(
-        #     doc="Teste",
-        #     n_processo="Teste",
-        #     data_autuacao="2024-01-01",
-        #     materia="aaaaaaaaa",
-        #     ementa="fsfsfsfsfsffsfsf",
-        #     tribunal="tce",
-        #     link="wwwwww",
-        # )
-        # session.add(teste)
-        # session.commit()
-        # print(teste.id)
-
-        # teste_parte = Parte(parte="Meg", doc_id=teste.id)
-        # session.add(teste_parte)
-        # session.commit()
