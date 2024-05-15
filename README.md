@@ -8,9 +8,10 @@
 - BeautifulSoup
 - SQLAlchemy
 - Elasticsearch
+- MySql
 
 ## Tela de Busca - TCE SP
-#### Inserir imagem
+#### ![imagem](./tela_tcesp.png)
 #
 ## Instruções de uso
 
