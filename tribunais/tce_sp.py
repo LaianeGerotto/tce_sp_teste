@@ -216,7 +216,7 @@ class TceSp:
         return processos
 
     # FUNÇĀO PARA CONVERTER A LISTA PARA JSON E ARMAZENAR NA MEMÓRIA
-    def convert_json(conteudo_json: list):
+    def convert_json(self, conteudo_json: list):
         with open("dados.json", "w") as arquivo:
             json.dump(
                 {"Documentos": conteudo_json}, arquivo, indent=2, ensure_ascii=False

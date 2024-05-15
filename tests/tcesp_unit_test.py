@@ -3,8 +3,6 @@ import datetime
 from bs4 import BeautifulSoup
 from tribunais.tce_sp import TceSp
 
-# TESTE UNITARIO/UNIDADE
-
 
 # TESTE PARA PERIODO INVÁLIDO - LISTA COM INTEIRO(TAMANHO DIFERENTE DE 4 DIGITOS)
 def test_len_validacao_periodo_invalido():
